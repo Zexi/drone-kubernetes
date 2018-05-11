@@ -1,4 +1,10 @@
-#!/bin/bash
+#!/bin/bash -x
+
+echo "========ENV=========="
+
+env
+
+echo "====================="
 
 if [ -z ${PLUGIN_NAMESPACE} ]; then
   PLUGIN_NAMESPACE="default"
@@ -36,8 +42,9 @@ kubectl config use-context default
 IFS=',' read -r -a DEPLOYMENTS <<< "${PLUGIN_DEPLOYMENT}"
 IFS=',' read -r -a CONTAINERS <<< "${PLUGIN_CONTAINER}"
 for DEPLOY in ${DEPLOYMENTS[@]}; do
-  echo Deploying to $KUBERNETES_SERVER
+  echo Deploying ${DEPLOY} to $KUBERNETES_SERVER
   for CONTAINER in ${CONTAINERS[@]}; do
+    echo "Deploying deployment/container: ${DEPLOY}/${CONTAINER}=${PLUGIN_REPO}:${PLUGIN_TAG}"
     if [[ ${PLUGIN_FORCE} == "true" ]]; then
       kubectl -n ${PLUGIN_NAMESPACE} set image deployment/${DEPLOY} \
         ${CONTAINER}=${PLUGIN_REPO}:${PLUGIN_TAG}FORCE
